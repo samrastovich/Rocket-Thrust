@@ -6,6 +6,15 @@ using UnityEngine.SceneManagement;
 public class Rocket : MonoBehaviour
 {
     [SerializeField] float rcsThrust = 100f;
+    [SerializeField] AudioClip mainEngine;
+    [SerializeField] AudioClip levelUpSound;
+    [SerializeField] AudioClip deathSound;
+
+    [SerializeField] ParticleSystem mainEngineParticles;
+    [SerializeField] ParticleSystem successParticles;
+    [SerializeField] ParticleSystem deathParticles;
+
+
     Rigidbody rigidBody;
     AudioSource audioSource;
     bool engineIsRunning = false;
@@ -46,6 +55,8 @@ public class Rocket : MonoBehaviour
         {
             case "Enemy":
                 state = State.Dying;
+                audioSource.PlayOneShot(deathSound);
+                deathParticles.Play();
                 Invoke("LoadFirstScene", 1f);
                 break;
             case "Friendly":
@@ -53,6 +64,8 @@ public class Rocket : MonoBehaviour
                 break;
             case "Finish":
                 state = State.Transcending;
+                audioSource.PlayOneShot(levelUpSound);
+                successParticles.Play();
                 Invoke("LoadNextScene", 1f);
                 break;
         }
@@ -90,14 +103,16 @@ public class Rocket : MonoBehaviour
             rigidBody.AddRelativeForce(Vector3.up);
             if (!engineIsRunning)
             {
-                audioSource.Play();
+                audioSource.PlayOneShot(mainEngine);
                 engineIsRunning = true;
+                mainEngineParticles.Play();
             }
         }
         else
         {
             audioSource.Stop();
             engineIsRunning = false;
+            mainEngineParticles.Stop();
         }
     }
 }
